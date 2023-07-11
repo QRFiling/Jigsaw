@@ -1,0 +1,239 @@
+﻿<Window x:Class="Jigsaw.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Jigsaw"
+        mc:Ignorable="d"
+        Title="Jigsaw" Width="1280" Height="720" WindowStartupLocation="CenterScreen" PreviewMouseWheel="Window_PreviewMouseWheel">
+
+    <Window.Resources>
+        <Style x:Key="borderbutton" TargetType="Border">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="CornerRadius" Value="15"/>
+            <Setter Property="BorderBrush" Value="Gainsboro"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color" To="#F0F0F0" Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color" To="White" Duration="0:0:0.2"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="grid">
+        <Canvas x:Name="canvas" Background="Transparent" Margin="50" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Canvas.RenderTransform>
+                <TransformGroup>
+                    <TranslateTransform x:Name="canvasMove"/>
+                    <ScaleTransform x:Name="canvasScale" ScaleX="0.7" ScaleY="0.7"/>
+                </TransformGroup>
+            </Canvas.RenderTransform>
+
+            <Rectangle x:Name="jigsawBorder" Panel.ZIndex="-3" IsHitTestVisible="False" Width="100" Height="100" Stroke="Black" StrokeThickness="2"
+                       RadiusX="10" RadiusY="10" StrokeDashArray="5,5" Opacity="0.4"/>
+
+            <Rectangle x:Name="background" Panel.ZIndex="-2" Opacity="0.5">
+                <Rectangle.Fill>
+                    <ImageBrush Stretch="None" TileMode="FlipXY" Viewport="0,0,0.25,0.25"/>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <Image x:Name="previewBackground" Panel.ZIndex="-1" IsHitTestVisible="False" Opacity="0.5" Stretch="UniformToFill"/>
+
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="10" Visibility="Collapsed">
+                <Border.Background>
+                    <SolidColorBrush Color="Black" Opacity="0"/>
+                </Border.Background>
+
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=boxImage, Path=IsMouseOver}" Value="True">
+                                <DataTrigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Background.Opacity" To="0.2"
+                                                         Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.EnterActions>
+
+                                <DataTrigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetProperty="Background.Opacity" To="0"
+                                                         Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </DataTrigger.ExitActions>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="boxImageTranslate"/>
+                </Border.RenderTransform>
+
+                <Image x:Name="boxImage" RenderTransformOrigin="0.5,0.5" Margin="10" Cursor="Hand" MouseLeftButtonUp="boxImage_MouseLeftButtonUp">
+                    <Image.Effect>
+                        <DropShadowEffect x:Name="boxBlur" BlurRadius="30" Opacity="0.3" ShadowDepth="0"/>
+                    </Image.Effect>
+
+                    <Image.RenderTransform>
+                        <ScaleTransform x:Name="boxImageScale" ScaleY="{Binding RelativeSource={RelativeSource Self}, Path=ScaleX}"/>
+                    </Image.RenderTransform>
+                </Image>
+            </Border>
+        </Canvas>
+
+        <Rectangle Fill="Black" Panel.ZIndex="3" Height="1" VerticalAlignment="Top" Opacity="0.1"/>
+
+        <Border x:Name="preview" Background="White" Panel.ZIndex="1" Width="150" Height="200" Margin="50,-200,0,0"
+                VerticalAlignment="Top" HorizontalAlignment="Left" CornerRadius="0,0,20,20" Visibility="Collapsed">
+
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="0" BlurRadius="20" Opacity="0.2"/>
+            </Border.Effect>
+
+            <Grid>
+                <Border Margin="10" CornerRadius="10">
+                    <Border.Background>
+                        <ImageBrush x:Name="previewImage" Stretch="Fill"/>
+                    </Border.Background>
+                </Border>
+
+                <Border x:Name="overPrevieworder" Margin="10" CornerRadius="10" Cursor="Hand" MouseEnter="overPrevieworder_MouseEnter"
+                        MouseLeave="overPrevieworder_MouseLeave">
+
+                    <Border.Background>
+                        <SolidColorBrush Color="Black" Opacity="0"/>
+                    </Border.Background>
+
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Background.Opacity" To="0.2" Duration="0:0:0.15"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Background.Opacity" To="0" Duration="0:0:0.15"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+            </Grid>
+        </Border>
+
+        <Border HorizontalAlignment="Right" Margin="20" Style="{StaticResource borderbutton}" MouseLeftButtonUp="Border_MouseLeftButtonUp_3">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,20,0">
+                <Image Source="pack://application:,,,/Jigsaw;component/Resources/Home.png" Width="17" Height="17" Margin="0,0,0,1"/>
+                <TextBlock Text="В меню" FontSize="12" VerticalAlignment="Center" Margin="5,-1,0,0" FontFamily="{StaticResource MontserratRegular}"/>
+            </StackPanel>
+        </Border>
+
+        <Border HorizontalAlignment="Right" Margin="0,20,140,0" Style="{StaticResource borderbutton}" Width="165" MouseLeftButtonUp="Border_MouseLeftButtonUp_1">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,20,0">
+                <Image Source="pack://application:,,,/Jigsaw;component/Resources/Background.png" Width="17" Height="17"/>
+                <TextBlock Text="Выключить фон" FontSize="12" VerticalAlignment="Center" Margin="5,-1,0,0" FontFamily="{StaticResource MontserratRegular}"/>
+            </StackPanel>
+        </Border>
+
+        <Border HorizontalAlignment="Right" Margin="0,20,312,0" Style="{StaticResource borderbutton}" MouseLeftButtonUp="Border_MouseLeftButtonUp_2">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,20,0">
+                <Image Source="pack://application:,,,/Jigsaw;component/Resources/Group.png" Width="17" Height="17"/>
+                <TextBlock Text="Группировать" FontSize="12" VerticalAlignment="Center" Margin="7,-1,0,0" FontFamily="{StaticResource MontserratRegular}"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="showPreviewButton" HorizontalAlignment="Left" Margin="50,20,0,0" Style="{StaticResource borderbutton}" MouseLeftButtonUp="Border_MouseLeftButtonUp">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,20,0">
+                <Image Source="pack://application:,,,/Jigsaw;component/Resources/Eye.png" Width="15" Height="15"/>
+                <TextBlock Text="Показать фото" FontSize="12" VerticalAlignment="Center" Margin="5,-1,0,0" FontFamily="{StaticResource MontserratRegular}"/>
+            </StackPanel>
+        </Border>
+
+        <Border x:Name="previewPin" HorizontalAlignment="Left" Margin="160,20,0,0" Style="{StaticResource borderbutton}"
+                MouseLeftButtonUp="previewPin_MouseLeftButtonUp" Visibility="Collapsed">
+            
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="26">
+                <Image Source="pack://application:,,,/Jigsaw;component/Resources/Pin.png" Width="18.5" Margin="3,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <TextBlock x:Name="jigsawStats" VerticalAlignment="Bottom" Margin="30" Opacity="0.7" FontSize="11"
+                   HorizontalAlignment="Right" FontFamily="{StaticResource MontserratRegular}"/>
+
+        <Border x:Name="loadingScreen" Visibility="Collapsed">
+            <Border.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="Silver" Offset="0"/>
+                    <GradientStop Color="WhiteSmoke" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,70,0,0">
+                    <Ellipse Stroke="DimGray" StrokeThickness="1" Width="25" Height="25" Opacity="0.3"/>
+
+                    <Ellipse Stroke="DimGray" StrokeThickness="1" Width="25" Height="25" Margin="0,-25,0,0" RenderTransformOrigin="0.5,0.5">
+                        <Ellipse.Clip>
+                            <RectangleGeometry Rect="0,0,10,10"/>
+                        </Ellipse.Clip>
+
+                        <Ellipse.RenderTransform>
+                            <RotateTransform x:Name="loadingCircleRotate"/>
+                        </Ellipse.RenderTransform>
+                    </Ellipse>
+
+                    <TextBlock Text="Загрузка..." Foreground="DimGray" FontSize="13" VerticalAlignment="Center"
+                           FontFamily="{StaticResource MontserratRegular}" HorizontalAlignment="Center" Margin="7,10,0,0"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="1" HorizontalAlignment="Center" Foreground="DimGray" Opacity="0.8"
+                           FontFamily="{StaticResource MontserratRegular}" FontSize="11">
+                    
+                    <Run Text="На данный момент загруженно"/>
+                    <Run x:Name="loadingProgressText" Text="0/0"/>
+                    <Run Text="частей"/>
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

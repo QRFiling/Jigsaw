@@ -1,0 +1,220 @@
+﻿<UserControl x:Class="Jigsaw.PuzzleInfo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Jigsaw"
+             mc:Ignorable="d" Height="609.5" Width="385" RenderTransformOrigin="0.5,0.5">
+
+    <UserControl.RenderTransform>
+        <ScaleTransform x:Name="scale" ScaleY="{Binding RelativeSource={RelativeSource Self}, Path=ScaleX}"/>
+    </UserControl.RenderTransform>
+
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <EventTrigger RoutedEvent="Loaded">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="RenderTransform.ScaleX"
+                                             Duration="0:0:0.5" From="0.8" To="1">
+                                <DoubleAnimation.EasingFunction>
+                                    <PowerEase Power="7"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+    
+    <Grid ClipToBounds="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="264"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.RowSpan="2" Background="White" CornerRadius="10"/>
+
+        <Border CornerRadius="10,10,0,0">
+            <Border.Background>
+                <LinearGradientBrush>
+                    <GradientStop Color="WhiteSmoke" Offset="0"/>
+                    <GradientStop Color="Silver" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <Image x:Name="box" Width="240" Height="240"
+                    Stretch="Uniform" Margin="0,15,0,0">
+            
+            <Image.RenderTransform>
+                <TranslateTransform x:Name="boxTranslate"/>
+            </Image.RenderTransform>
+
+            <Image.Effect>
+                <DropShadowEffect ShadowDepth="7" BlurRadius="10" Opacity="0.15"/>
+            </Image.Effect>
+        </Image>
+
+        <Image x:Name="image" Width="385" Stretch="Uniform">
+            <Image.RenderTransform>
+                <TranslateTransform x:Name="imageTranslate" X="385"/>
+            </Image.RenderTransform>
+        </Image>
+
+        <Border Width="30" Height="30" CornerRadius="15" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="15"
+                Cursor="Hand" MouseLeftButtonUp="Border_MouseLeftButtonUp_1">
+            
+            <TextBlock Text="✕" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontSize="15"/>
+
+            <Border.Background>
+                <SolidColorBrush Color="Black" Opacity="0"/>
+            </Border.Background>
+            
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Background.Opacity"
+                                                         To="0.1" Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Background.Opacity"
+                                                         To="0" Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+        </Border>
+
+        <StackPanel Grid.Row="1" Margin="50,30,30,30">
+            <TextBlock x:Name="title" MaxHeight="100" TextTrimming="CharacterEllipsis"
+                   TextWrapping="Wrap" FontFamily="{StaticResource MontserratBold}" FontSize="20" VerticalAlignment="Top"/>
+
+            <Grid Height="140" Margin="0,10,0,0" Opacity="0.7">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="0.6*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="{StaticResource MontserratRegular}"/>
+                                <Setter Property="VerticalAlignment" Value="Center"/>
+                            </Style>
+                        </Style.Resources>
+                    </Style>
+                </Grid.Style>
+
+                <TextBlock Text="Количество пазлов"/>
+                <TextBlock Grid.Column="1" x:Name="tabel1"/>
+
+                <TextBlock Grid.Row="1" Text="Автор фото"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" TextTrimming="CharacterEllipsis" x:Name="table2"/>
+
+                <TextBlock Grid.Row="2" Text="Размер"/>
+                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="table3"/>
+
+                <TextBlock Grid.Row="3" Text="Размер фото"/>
+                <TextBlock Grid.Row="3" Grid.Column="1" x:Name="table4"/>
+
+                <TextBlock Grid.Row="4" Text="Дата создания"/>
+                <TextBlock Grid.Row="4" Grid.Column="1" x:Name="table5"/>
+            </Grid>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Height="35" VerticalAlignment="Bottom" Margin="40,0,40,30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="leftButton" BorderBrush="Gainsboro" BorderThickness="2" CornerRadius="5" Cursor="Hand" Background="Transparent" MouseLeftButtonUp="Border_MouseLeftButtonUp">
+                <TextBlock Text="В коллекцию" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                           FontFamily="{StaticResource MontserratRegular}" FontSize="11"/>
+
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                            To="#EDEDED" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                            To="Transparent" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+
+            <Border Grid.Column="2" Background="#348A4E" CornerRadius="5" Cursor="Hand" MouseLeftButtonUp="Border_MouseDown">
+                <TextBlock Text="Начать сборку" VerticalAlignment="Center" HorizontalAlignment="Center" 
+                           FontFamily="{StaticResource MontserratRegular}" FontSize="11" Foreground="White"/>
+
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Trigger.EnterActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                            To="#2B7943" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.EnterActions>
+
+                                <Trigger.ExitActions>
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                            To="#348A4E" Duration="0:0:0.1"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </Trigger.ExitActions>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

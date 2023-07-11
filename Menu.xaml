@@ -1,0 +1,577 @@
+﻿<UserControl x:Class="Jigsaw.Menu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Jigsaw"
+             mc:Ignorable="d" 
+             d:DesignHeight="720" d:DesignWidth="1280" Loaded="UserControl_Loaded">
+    
+    <UserControl.Resources>
+        <Style x:Key="BorderButton" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="Black" Opacity="0"/>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Cursor" Value="Hand"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard Storyboard.TargetProperty="Background.Opacity">
+                                <DoubleAnimation Duration="0:0:0.3" To="0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard Storyboard.TargetProperty="Background.Opacity">
+                                <DoubleAnimation Duration="0:0:0.3" To="0"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
+
+            <Style.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontFamily" Value="{StaticResource MontserratRegular}"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="10,0,0,0"/>
+                </Style>
+            </Style.Resources>
+        </Style>
+
+        <ControlTemplate x:Key="ComboBoxToggleButton" TargetType="{x:Type ToggleButton}">
+            <Grid Cursor="Hand">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="30" />
+                </Grid.ColumnDefinitions>
+                <Border
+                  x:Name="Border" 
+                  Grid.ColumnSpan="2"
+                  CornerRadius="5"
+                  Background="Transparent"
+                    BorderBrush="#348A4E"
+                    BorderThickness="2"
+                  />
+                <Border 
+                  Grid.Column="0"
+                  CornerRadius="5,0,0,5" 
+                  Margin="2" 
+                  Background="Transparent"/>
+                <Path 
+                  x:Name="Arrow"
+                  Grid.Column="1"     
+                  Fill="#348A4E"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Data="M0,0 L0,2 L4,6 L8,2 L8,0 L4,4 z"
+                />
+            </Grid>
+            <ControlTemplate.Triggers>
+                <Trigger Property="ToggleButton.IsMouseOver" Value="true">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Background.Color"
+                                                To="#ECECEC" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Background.Color"
+                                                To="Transparent" Duration="0:0:0.1"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="ComboBoxTextBox" TargetType="{x:Type TextBox}">
+            <Border x:Name="PART_ContentHost" Focusable="False" Background="{TemplateBinding Background}" />
+        </ControlTemplate>
+
+        <Style x:Key="{x:Type ComboBox}" TargetType="{x:Type ComboBox}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.CanContentScroll" Value="true"/>
+            <Setter Property="MinWidth" Value="120"/>
+            <Setter Property="MinHeight" Value="20"/>
+            <Setter Property="Foreground" Value="#348A4E"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBox}">
+                        <Grid>
+                            <ToggleButton 
+                            Name="ToggleButton" 
+                            Template="{StaticResource ComboBoxToggleButton}" 
+                            Grid.Column="2" 
+                            Focusable="false"
+                            IsChecked="{Binding Path=IsDropDownOpen,Mode=TwoWay,RelativeSource={RelativeSource TemplatedParent}}"
+                            ClickMode="Press">
+                            </ToggleButton>
+                            <ContentPresenter Name="ContentSite" IsHitTestVisible="False" Content="{TemplateBinding SelectionBoxItem}"
+                            ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                            ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                            Margin="13,3,23,3"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center" />
+                            <TextBox x:Name="PART_EditableTextBox"
+                            Style="{x:Null}" 
+                            Template="{StaticResource ComboBoxTextBox}" 
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center" 
+                            Margin="3,3,23,3"
+                            Focusable="True"
+                            Background="Blue"
+                            Foreground="Red"
+                            Visibility="Hidden"
+                            IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                            <Popup
+                            Name="Popup"
+                            Placement="Top"
+                            IsOpen="{TemplateBinding IsDropDownOpen}"
+                            AllowsTransparency="True" 
+                            Focusable="False"
+                                PopupAnimation="Fade">
+
+                                <Grid Name="DropDown" Margin="0,7,0,0"
+                              SnapsToDevicePixels="True"                
+                              MinWidth="{TemplateBinding ActualWidth}"
+                              MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                    <Border x:Name="DropDownBorder" Background="#E3E6E7" BorderBrush="Gainsboro"
+                                            BorderThickness="1" CornerRadius="3"/>
+                                    
+                                    <ScrollViewer Margin="0,7,0,7" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Grid>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="HasItems" Value="false">
+                                <Setter TargetName="DropDownBorder" Property="MinHeight" Value="95"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                            <Trigger Property="IsGrouping" Value="true">
+                                <Setter Property="ScrollViewer.CanContentScroll" Value="false"/>
+                            </Trigger>
+                            <Trigger Property="IsEditable"  Value="true">
+                                <Setter Property="IsTabStop" Value="false"/>
+                                <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+            </Style.Triggers>
+        </Style>
+
+        <!-- SimpleStyles: ComboBoxItem -->
+        <Style x:Key="{x:Type ComboBoxItem}" TargetType="{x:Type ComboBoxItem}">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ComboBoxItem}">
+                        <Border Name="Border" Background="Transparent"
+                              SnapsToDevicePixels="true">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="true">
+                                <Setter TargetName="Border" Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="#348A4E" Opacity="0.15"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#888888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <local:IsNullConverter x:Key="isNullConverter"/>
+        <local:JigsawImageBoxConverter x:Key="jigsawImageConverter"/>
+    </UserControl.Resources>
+
+    <Grid x:Name="grid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.Background>
+            <LinearGradientBrush>
+                <GradientStop Color="#DCDFE4" Offset="0"/>
+                <GradientStop Color="#FBFBFC" Offset="0.5"/>
+                <GradientStop Color="#E4E8E9" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Rectangle Fill="White"/>
+        <TextBlock Text="JIGSAW" FontSize="15" Margin="25" FontFamily="{StaticResource MontserratBold}"/>
+
+        <StackPanel x:Name="categoriesPanel" Grid.Row="1" Margin="0,80,0,0" VerticalAlignment="Top">
+            <TextBlock Text="КАТЕГОРИИ" Margin="24,0,0,7" FontFamily="{StaticResource MontserratRegular}" Opacity="0.3"/>
+
+            <Border x:Name="category1" Style="{StaticResource BorderButton}" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="20" Height="20" Fill="Black" Margin="22,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Random.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Случайные"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="category2" Style="{StaticResource BorderButton}" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="22" Height="22" Fill="Black" Margin="22,-2,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Nature.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Природа"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="category3" Style="{StaticResource BorderButton}" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="21" Height="20" Fill="Black" Margin="22,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/City.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Город"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="category4" Style="{StaticResource BorderButton}" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="21" Height="21" Fill="Black" Margin="22,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Transport.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Транспорт"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="category5" Style="{StaticResource BorderButton}" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="22" Height="20" Fill="Black" Margin="22,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Art.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Живопись"/>
+                </StackPanel>
+            </Border>
+
+            <TextBlock Text="КОЛЛЕКЦИЯ" Margin="27,20,0,5" FontFamily="{StaticResource MontserratRegular}" Opacity="0.3"/>
+
+            <Border x:Name="category6" Style="{StaticResource BorderButton}" Grid.Row="1" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="21" Height="21" Fill="Black" Margin="25,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Work.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Незавершённые пазлы"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="category7" Style="{StaticResource BorderButton}" Grid.Row="1" Height="40" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="20" Height="20" Fill="Black" Margin="25,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Collection.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Собранные пазлы"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="category8" Style="{StaticResource BorderButton}" Grid.Row="1" Height="40" VerticalAlignment="Top"
+                    AllowDrop="True" DragEnter="category8_DragEnter" Drop="category8_Drop">
+
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="20" Height="20" Fill="Black" Margin="25,0,0,0">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/Jigsaw;component/Resources/Add.png"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Загрузить свой пазл"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <TextBlock Text="Автор QR Filing" VerticalAlignment="Bottom" Margin="53,0,0,58" FontSize="9" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp"
+                   HorizontalAlignment="Left" FontFamily="{StaticResource MontserratRegular}" Opacity="0.45" Cursor="Hand">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="TextDecorations" Value="Underline"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <TextBlock Text="Используется Unsplash API" VerticalAlignment="Bottom" Margin="53,0,0,35" FontSize="9" MouseLeftButtonUp="TextBlock_MouseLeftButtonUp_1"
+                   HorizontalAlignment="Left" FontFamily="{StaticResource MontserratRegular}" Opacity="0.45" Cursor="Hand">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="TextDecorations" Value="Underline"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <Image Source="pack://application:,,,/Jigsaw;component/Resources/Logo.png" Width="13"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="30,0,0,57" Opacity="0.25"/>
+
+        <Image Source="pack://application:,,,/Jigsaw;component/Resources/Logo2.png" Width="13"
+               HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="30,0,0,34" Opacity="0.25"/>
+
+        <Rectangle x:Name="thumb" Width="4" Height="40" Fill="#348A4E" Grid.Row="1" HorizontalAlignment="Left"
+                   VerticalAlignment="Top" Margin="0,65,0,0"/>
+
+        <Grid x:Name="listGrid" Grid.Column="1" Grid.Row="1">
+            <ListBox x:Name="list" Width="900" Margin="0,40,0,0" SelectionChanged="list_SelectionChanged" BorderThickness="0" Background="Transparent"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Style.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                            <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="Transparent" />
+                        </Style.Resources>    
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid x:Name="parentGrid" Width="220" Height="220" Margin="-2,0,0,0">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+
+                                        <DataTrigger Binding="{Binding Converter={StaticResource isNullConverter}}" Value="False">
+                                            <Setter Property="Cursor" Value="Hand"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+
+                            <Rectangle Margin="20" RadiusX="10" RadiusY="10" Opacity="0.2" Initialized="Rectangle_Initialized">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush>
+                                        <GradientStop Color="Transparent" Offset="0"/>
+                                        <GradientStop Color="Black" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+
+                            <Border BorderThickness="0,0,1,1">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush Color="Black" Opacity="0.07"/>
+                                </Border.BorderBrush>
+
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background">
+                                            <Setter.Value>
+                                                <SolidColorBrush Color="Black" Opacity="0"/>
+                                            </Setter.Value>
+                                        </Setter>
+
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding ElementName=parentGrid, Path=IsMouseOver}" Value="True"/>
+                                                    <Condition Binding="{Binding Converter={StaticResource isNullConverter}}" Value="False"/>
+                                                </MultiDataTrigger.Conditions>
+
+                                                <MultiDataTrigger.EnterActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Background.Opacity" Duration="0:0:0.01" To="0.05"/>
+                                                            <ThicknessAnimation Storyboard.TargetProperty="BorderThickness" Duration="0:0:0.01" To="1"/>
+                                                            <ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" Duration="0:0:0.01" To="#348A4E"/>
+                                                            <DoubleAnimation Storyboard.TargetProperty="BorderBrush.Opacity" Duration="0:0:0.01" To="1"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </MultiDataTrigger.EnterActions>
+
+                                                <MultiDataTrigger.ExitActions>
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Background.Opacity" Duration="0:0:0.01" To="0"/>
+                                                            <ThicknessAnimation Storyboard.TargetProperty="BorderThickness" Duration="0:0:0.01" To="0,0,1,1"/>
+                                                            <ColorAnimation Storyboard.TargetProperty="BorderBrush.Color" Duration="0:0:0.01" To="Black"/>
+                                                            <DoubleAnimation Storyboard.TargetProperty="BorderBrush.Opacity" Duration="0:0:0.01" To="0.07"/>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </MultiDataTrigger.ExitActions>
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+
+                            <Image Source="{Binding Converter={StaticResource jigsawImageConverter}}" Margin="20,10,20,60" Stretch="Uniform">
+                                <Image.Effect>
+                                    <DropShadowEffect ShadowDepth="7" BlurRadius="10" Opacity="0.15"/>
+                                </Image.Effect>
+                            </Image>
+
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Bottom" Margin="15" FontSize="11" MaxWidth="120" TextTrimming="CharacterEllipsis"
+                                   Opacity="0.5" FontFamily="{StaticResource MontserratRegular}" HorizontalAlignment="Left" MaxHeight="50"/>
+
+                            <Border VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="13" BorderThickness="2" CornerRadius="4">
+                                <Border.BorderBrush>
+                                    <SolidColorBrush Color="Black" Opacity="0.1"/>
+                                </Border.BorderBrush>
+
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+
+                                <TextBlock Margin="7,3,7,3" FontSize="9" FontFamily="{StaticResource MontserratRegular}">
+                                <Run Text="{Binding PiecesCount}"/><Run Text=" шт"/>
+                                </TextBlock>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Margin="250,0,70,50" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                <TextBlock Text="Желаемый диапазон пазлов" FontFamily="{StaticResource MontserratRegular}"
+                               FontSize="10" Opacity="0.8"/>
+
+                <ComboBox Width="200" Height="28" Margin="-2,10,0,0" FontFamily="{StaticResource MontserratRegular}"
+                          SelectedIndex="1" VerticalAlignment="Bottom" SelectionChanged="ComboBox_SelectionChanged">
+
+                    <ComboBoxItem Content="10 пазлов" Tag="180"/>
+                    <ComboBoxItem Content="20 пазлов" Tag="100"/>
+                    <ComboBoxItem Content="50 пазлов" Tag="90"/>
+                    <ComboBoxItem Content="100 пазлов" Tag="70"/>
+                    <ComboBoxItem Content="150 пазлов" Tag="65"/>
+                    <ComboBoxItem Content="200 пазлов" Tag="55"/>
+                    <ComboBoxItem Content="250 пазлов" Tag="45"/>
+                    <ComboBoxItem Content="300+ пазлов" Tag="40"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel  Margin="0,0,250,50" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                <TextBlock Text="Новые результаты" FontFamily="{StaticResource MontserratRegular}"
+                               FontSize="10" Opacity="0.8"/>
+
+                <Border CornerRadius="5" Width="200" Margin="0,10,0,0" Height="28"
+                        Cursor="Hand" MouseLeftButtonUp="Border_MouseLeftButtonUp">
+                    
+                    <Border.Background>
+                        <SolidColorBrush Color="Black" Opacity="0.05"/>
+                    </Border.Background>
+                    
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Text="Обновить"
+                           FontFamily="{StaticResource MontserratRegular}" FontSize="11" Opacity="0.8"/>
+
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Trigger.EnterActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Background.Opacity"
+                                                            To="0.1" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.EnterActions>
+
+                                    <Trigger.ExitActions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetProperty="Background.Opacity"
+                                                            To="0.05" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </Trigger.ExitActions>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                </Border>
+            </StackPanel>
+
+            <Grid x:Name="errorSign" HorizontalAlignment="Center" Margin="0,100,0,0" VerticalAlignment="Top" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="45"/>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                
+                <Image Grid.RowSpan="2" Source="pack://application:,,,/Jigsaw;component/Resources/Error.png"/>
+
+                <TextBlock Grid.Column="2" Text="Не удалось загрузить изображения из интернета" FontSize="14"
+                           FontFamily="{StaticResource MontserratBold}"/>
+
+                <TextBlock FontSize="11" Grid.Column="2" Grid.Row="1" FontFamily="{StaticResource MontserratRegular}">
+                    <Run Text="● возможно нет подключения к сети"/>
+                    <LineBreak/>
+                    <Run Text="● или сервер не отвечает (как вариант - VPN)"/>
+                    <LineBreak/>
+                    <Run Text="● либо у тебя слишком много запросов (попробуй позже)"/>
+                </TextBlock>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

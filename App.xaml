@@ -1,0 +1,10 @@
+﻿<Application x:Class="Jigsaw.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Jigsaw"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <FontFamily x:Key="MontserratRegular">pack://application:,,,/Resources/#Montserrat Regular</FontFamily>
+        <FontFamily x:Key="MontserratBold">pack://application:,,,/Resources/#Montserrat Bold</FontFamily>
+    </Application.Resources>
+</Application>
